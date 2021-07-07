@@ -19,5 +19,6 @@ def usd_token(usd_token, accounts):
     return usd_token.deploy("Usd", "USD", 18, 1e6, {'from': accounts[0]})
 
 @pytest.fixture(scope="module")
-def lambo_token(lambo_token, accounts):
-    return lambo_token.deploy("Usd", "USD", 18, 1e6, {'from': accounts[0]})
+def potato_token(potato_token, accounts):
+    return potato_token.deploy("Potato", "LMB", 18, 1e8, {'from': accounts[0]})
+
