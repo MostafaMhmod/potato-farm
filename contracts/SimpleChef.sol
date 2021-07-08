@@ -13,7 +13,6 @@ contract SimpleChef {
     uint256 public potatoPerBlock;
     uint256 public accPotatoPerShare;
 
-
     address[] public stakers;
     mapping(address => uint256) public stakingBalance;
     mapping(address => uint256) public UserRewardDept;
@@ -28,7 +27,11 @@ contract SimpleChef {
     }
 
     // Return reward multiplier over the given _from to _to block.
-    function getMultiplier(uint256 _from, uint256 _to) public view returns (uint256) {
+    function getMultiplier(uint256 _from, uint256 _to)
+        public
+        view
+        returns (uint256)
+    {
         return _to.sub(_from);
     }
 
@@ -44,7 +47,9 @@ contract SimpleChef {
         uint256 multiplier = getMultiplier(lastRewardBlock, block.number);
         uint256 reward = multiplier.mul(potatoPerBlock);
         potato.mint(address(this), reward);
-        accPotatoPerShare = accPotatoPerShare.add(reward.mul(1e12).div(usdBalance));
+        accPotatoPerShare = accPotatoPerShare.add(
+            reward.mul(1e12).div(usdBalance)
+        );
         lastRewardBlock = block.number;
     }
 
@@ -52,15 +57,17 @@ contract SimpleChef {
         update();
         userBalance = stakingBalance[msg.sender];
         if (userBalance > 0) {
-            uint256 pending = userBalance.mul(accPotatoPerShare).div(1e12).sub(UserRewardDept[msg.sender]);
-            if(pending > 0) {
+            uint256 pending = userBalance.mul(accPotatoPerShare).div(1e12).sub(
+                UserRewardDept[msg.sender]
+            );
+            if (pending > 0) {
                 safePotatoTransfer(msg.sender, pending);
             }
         }
-        if(_amount > 0) {
+        if (_amount > 0) {
             usd.transferFrom(address(msg.sender), address(this), _amount);
             stakingBalance[msg.sender] = userBalance.add(_amount);
-            
+
             // Add user to stakers array *only* if they haven't staked already
             if (!hasStaked[msg.sender]) {
                 stakers.push(msg.sender);
@@ -70,9 +77,31 @@ contract SimpleChef {
             isStaking[msg.sender] = true;
             hasStaked[msg.sender] = true;
         }
-        UserRewardDept[msg.sender] = userBalance.mul(accPotatoPerShare).div(1e12);
+        UserRewardDept[msg.sender] = userBalance.mul(accPotatoPerShare).div(
+            1e12
+        );
         emit Deposit(msg.sender, _amount);
+    }
 
+    function withdraw(uint256 _amount) public {
+        userBalance = stakingBalance[msg.sender];
+        require(userBalance >= _amount, "withdraw: not enough staked balance");
+        update();
+        uint256 pending = userBalance.mul(accPotatoPerShare).div(1e12).sub(
+            UserRewardDept[msg.sender]
+        );
+        if (pending > 0) {
+            safePotatoTransfer(msg.sender, pending);
+        }
+        if (_amount > 0) {
+            stakingBalance[msg.sender] = userBalance.sub(_amount);
+            isStaking[msg.sender] = false;
+            usd.transfer(address(msg.sender), _amount);
+        }
+        UserRewardDept[msg.sender] = userBalance
+        .mul(pool.accPotatoPerShare)
+        .div(1e12);
+        emit Withdraw(msg.sender, _amount);
     }
 
     // Safe potato transfer function, just in case if rounding error causes pool to not have enough potatos.
@@ -84,6 +113,4 @@ contract SimpleChef {
             potato.transfer(_to, _amount);
         }
     }
-
-
 }
