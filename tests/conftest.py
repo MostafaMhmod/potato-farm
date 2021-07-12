@@ -11,14 +11,17 @@ def isolate(fn_isolation):
 
 
 @pytest.fixture(scope="module")
-def token(Token, accounts):
-    return Token.deploy("Test Token", "TST", 18, 1e21, {'from': accounts[0]})
+def usd(Usd, accounts):
+    return Usd.deploy("Usd", "USD", 18, 1e24, {'from': accounts[0]})
+
 
 @pytest.fixture(scope="module")
-def usd_token(usd_token, accounts):
-    return usd_token.deploy("Usd", "USD", 18, 1e6, {'from': accounts[0]})
+def potato(Potato, accounts):
+    return Potato.deploy("Potato", "PTO", 18, 1e24, {'from': accounts[0]})
+
 
 @pytest.fixture(scope="module")
-def potato_token(potato_token, accounts):
-    return potato_token.deploy("Potato", "LMB", 18, 1e8, {'from': accounts[0]})
-
+def simple_chef(SimpleChef, potato, usd, accounts):
+    simple_chef = SimpleChef.deploy(potato.address, usd.address, {'from': accounts[0]})
+    potato.updateAdmin(simple_chef.address, {'from': accounts[0]})
+    return simple_chef
