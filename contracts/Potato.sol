@@ -36,6 +36,7 @@ contract Potato {
         decimals = _decimals;
         totalSupply = _totalSupply;
         balances[msg.sender] = _totalSupply;
+        admin = msg.sender;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
 
@@ -123,8 +124,8 @@ contract Potato {
         require(account != address(0), "mint to the zero address");
         require(msg.sender == admin, "caller must be the admin");
 
-        _totalSupply = _totalSupply.add(amount);
-        _balances[account] = _balances[account].add(amount);
+        totalSupply = totalSupply.add(amount);
+        balances[account] = balances[account].add(amount);
         emit Transfer(address(0), account, amount);
     }
 
