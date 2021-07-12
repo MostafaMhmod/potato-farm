@@ -4,3 +4,5 @@ __pycache__
 build/
 reports/
 env/
+Pipfile.lock
+.vscode
