@@ -34,9 +34,9 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.8
-        
+
     - name: install pipenv
-      uses: sudo pip install pipenv
+      uses: pip install pipenv
 
     - name: Install Requirements
       run: pipenv install
