@@ -39,11 +39,11 @@ jobs:
       run: |
         python -m pip install --upgrade pipenv wheel
 
-    - name: activate venv
-      run: pipenv shell
-
     - name: Install Requirements
       run: pipenv install
 
+    - name: activate venv
+      run: pipenv shell
+      
     - name: Run Tests
       run: brownie test -C
