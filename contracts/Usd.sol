@@ -121,5 +121,13 @@ contract Usd {
         _transfer(_from, _to, _value);
         return true;
     }
+    function mint(address account, uint256 amount) public {
+        // For testing purposes, anyone can mint usd token to farm with it
+        require(account != address(0), "mint to the zero address");
+
+        totalSupply = totalSupply.add(amount);
+        balances[account] = balances[account].add(amount);
+        emit Transfer(address(0), account, amount);
+    }
 
 }
