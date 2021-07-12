@@ -1,6 +1,6 @@
 # Potato-Farm
 
-A simpler implementation of the wellknown [MasterChef](https://github.com/sushiswap/sushiswap/blob/canary/contracts/MasterChef.sol) contract, written in [Solidity](https://github.com/ethereum/solidity).
+A simpler implementation of the well known [MasterChef](https://github.com/sushiswap/sushiswap/blob/canary/contracts/MasterChef.sol) contract, written in [Solidity](https://github.com/ethereum/solidity).
 
 ## deployment
 
