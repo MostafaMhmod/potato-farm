@@ -1,10 +1,11 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import "./Potato.sol";
 import "./Usd.sol";
 
 contract SimpleChef {
-    address public admin;
+    using SafeMath for uint256;
+
     Potato public potato;
     Usd public usd;
 
@@ -12,6 +13,7 @@ contract SimpleChef {
     uint256 public lastRewardBlock;
     uint256 public potatoPerBlock;
     uint256 public accPotatoPerShare;
+    address public admin;
 
     address[] public stakers;
     mapping(address => uint256) public stakingBalance;
@@ -23,6 +25,7 @@ contract SimpleChef {
         potato = _potato;
         usd = _usd;
         startBlock = block.number;
+        potatoPerBlock = 1e18;
         admin = msg.sender;
     }
 
@@ -35,7 +38,7 @@ contract SimpleChef {
         return _to.sub(_from);
     }
 
-    function update() {
+    function update() internal {
         if (block.number <= lastRewardBlock) {
             return;
         }
@@ -55,7 +58,7 @@ contract SimpleChef {
 
     function deposit(uint256 _amount) public {
         update();
-        userBalance = stakingBalance[msg.sender];
+        uint256 userBalance = stakingBalance[msg.sender];
         if (userBalance > 0) {
             uint256 pending = userBalance.mul(accPotatoPerShare).div(1e12).sub(
                 UserRewardDept[msg.sender]
@@ -80,11 +83,10 @@ contract SimpleChef {
         UserRewardDept[msg.sender] = userBalance.mul(accPotatoPerShare).div(
             1e12
         );
-        emit Deposit(msg.sender, _amount);
     }
 
     function withdraw(uint256 _amount) public {
-        userBalance = stakingBalance[msg.sender];
+        uint256 userBalance = stakingBalance[msg.sender];
         require(userBalance >= _amount, "withdraw: not enough staked balance");
         update();
         uint256 pending = userBalance.mul(accPotatoPerShare).div(1e12).sub(
@@ -98,10 +100,9 @@ contract SimpleChef {
             isStaking[msg.sender] = false;
             usd.transfer(address(msg.sender), _amount);
         }
-        UserRewardDept[msg.sender] = userBalance
-        .mul(pool.accPotatoPerShare)
-        .div(1e12);
-        emit Withdraw(msg.sender, _amount);
+        UserRewardDept[msg.sender] = userBalance.mul(accPotatoPerShare).div(
+            1e12
+        );
     }
 
     // Safe potato transfer function, just in case if rounding error causes pool to not have enough potatos.
@@ -112,5 +113,10 @@ contract SimpleChef {
         } else {
             potato.transfer(_to, _amount);
         }
+    }
+
+    function updatePotatoPerBlock(uint256 _amount) external {
+        require(msg.sender == admin, "caller must be the admin");
+        potatoPerBlock = _amount;
     }
 }
