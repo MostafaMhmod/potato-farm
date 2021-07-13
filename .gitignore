@@ -5,4 +5,3 @@ build/
 reports/
 env/
 Pipfile.lock
-.vscode

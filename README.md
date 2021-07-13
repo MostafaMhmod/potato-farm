@@ -22,8 +22,15 @@ A simpler implementation of the well known [MasterChef](https://github.com/sushi
     ```bash
     brownie accounts new testing
     ```
-
-5. Run the deployment script against the Ropsten testnet
+5. Add your RPC key (infura in our case):
+    ```bash
+    export WEB3_INFURA_PROJECT_ID=YOUR KEY
+    ```
+6. Add your Etherscan API key for contract verfication:
+    ```bash
+    export ETHERSCAN_TOKEN=YOUR KEY
+    ```
+5. Run the deployment script to the Ropsten testnet (the only one supported by the script so far)
 
     ```bash
     brownie run deployment --network ropsten
